@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: scraper
+    namespace: scraper
+data:
+    KAFKA_BROKERS: 'kafka:9092'
+    REDIS_URL: 'redis://redis:6379'
+    RATE_LIMIT_PER_SECOND: '2'
+    METRICS_PORT: '9090'
+    CRAWL_TOPIC: 'crawl-urls'
+    CRAWL_TOPIC_PRIORITY: 'crawl-urls-priority'
+    CRAWL_MAX_DEPTH: '3'

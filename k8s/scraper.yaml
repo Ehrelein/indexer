@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: scraper
+    namespace: scraper
+spec:
+    replicas: 6
+    selector:
+        matchLabels:
+            app: scraper
+    template:
+        metadata:
+            labels:
+                app: scraper
+        spec:
+            initContainers:
+                - name: migrate
+                  image: pet-scraper:latest
+                  imagePullPolicy: IfNotPresent
+                  command: ['npx', 'prisma', 'migrate', 'deploy']
+                  envFrom:
+                      - secretRef:
+                            name: scraper
+            containers:
+        - name: scraper
+          image: pet-scraper:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9090
+              name: metrics
+          envFrom:
+                      - configMapRef:
+                            name: scraper
+                      - secretRef:
+                            name: scraper
+                  resources:
+                      requests:
+                          memory: 512Mi
+                          cpu: 100m
+                      limits:
+                          memory: 8Gi
+                          cpu: '2'
+            restartPolicy: Always

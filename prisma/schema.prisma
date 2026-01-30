@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Page {
+  id            Int       @id @default(autoincrement())
+  urlHash       String    @unique
+  url           String    @unique
+  title         String?
+  description   String?
+  content       String?
+  h1            String?
+  links         Int       @default(0)
+  statusCode    Int?
+  lastCrawled   DateTime  @default(now()) @updatedAt
+  contentHash   String?   @default("")
+  
+  @@index([title])
+  @@index([lastCrawled])
+  @@map("pages")
+}

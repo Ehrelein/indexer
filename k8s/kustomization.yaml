@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: scraper
+resources:
+    - namespace.yaml
+    - postgres-secret.yaml
+    - postgres.yaml
+    - redis.yaml
+    - kafka.yaml
+    - scraper-secret.yaml
+    - scraper-configmap.yaml
+    - scraper.yaml
+    - nginx.yaml

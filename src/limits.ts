@@ -1,0 +1,2 @@
+export const MAX_URL_LENGTH = 10_000
+export const MAX_CONTENT_LENGTH = 100_000_000
