@@ -7,10 +7,12 @@ export default function Home() {
             <div className="search-page-bg" aria-hidden />
             <div className="search-page-overlay" aria-hidden />
             <div className="search-page-content">
-                <div className="search-page-strip">
+                <div className="search-page-top">
                     <SearchForm />
                 </div>
-                <SearchResults />
+                <div className="search-page-bottom">
+                    <SearchResults />
+                </div>
             </div>
         </main>
     )

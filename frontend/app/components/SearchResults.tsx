@@ -1,10 +1,8 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import { EventBus } from "@/lib/eventBus"
 import { trpcClient } from "@/lib/trpc-client"
-
-const RESULTS_CONTAINER_ID = "search-results"
 
 type SearchResult = {
     url: string
@@ -27,92 +25,68 @@ function toSearchResults(val: unknown): SearchResult[] {
     return val.filter(isSearchResult)
 }
 
-function renderPlaceholder(container: HTMLElement, message = "") {
-    container.innerHTML = ""
-    const p = document.createElement("p")
-    p.className = "result-placeholder"
-    p.textContent = message
-    container.appendChild(p)
-}
-
-function renderError(container: HTMLElement, message: string) {
-    container.innerHTML = ""
-    const p = document.createElement("p")
-    p.className = "result-error"
-    p.textContent = message
-    container.appendChild(p)
-}
-
-function renderLoading(container: HTMLElement) {
-    container.innerHTML = ""
-    const p = document.createElement("p")
-    p.className = "result-loading"
-    p.textContent = "Загрузка…"
-    container.appendChild(p)
-}
-
-function renderResults(container: HTMLElement, results: SearchResult[]) {
-    container.innerHTML = ""
-    const valid = results.filter(function hasUrl(r) { return r.url.length > 0 })
-    if (valid.length === 0) {
-        renderPlaceholder(container, "Ничего не найдено")
-        return
-    }
-    valid.forEach(function addItem(r) {
-        const item = document.createElement("div")
-        item.className = "result-item glass"
-        const link = document.createElement("a")
-        link.href = r.url
-        link.target = "_blank"
-        link.rel = "noopener noreferrer"
-        link.textContent = r.title ?? r.url
-        const snippet = document.createElement("div")
-        snippet.className = "result-snippet"
-        snippet.textContent = r.snippet ?? ""
-        const meta = document.createElement("div")
-        meta.className = "result-meta"
-        meta.textContent = "rank: " + String(r.rank)
-        item.appendChild(link)
-        item.appendChild(snippet)
-        item.appendChild(meta)
-        container.appendChild(item)
-    })
-}
+type Status = "idle" | "loading" | "done" | "error"
 
 export function SearchResults() {
-    useEffect(function subscribeSearch() {
-        const container = document.getElementById(RESULTS_CONTAINER_ID)
-        if (container === null) return
+    const [status, setStatus] = useState<Status>("idle")
+    const [results, setResults] = useState<SearchResult[]>([])
+    const [errorMessage, setErrorMessage] = useState("")
+    const containerRef = useRef<HTMLDivElement>(null)
 
-        function onSearch(data: { query?: string }) {
-            const el = document.getElementById(RESULTS_CONTAINER_ID)
-            if (el === null) return
+    useEffect(() => {
+        function runSearch(data: { query?: string }) {
             const query = (data.query ?? "").trim()
             if (query === "") {
-                renderPlaceholder(el, "")
+                setStatus("idle")
+                setResults([])
+                setErrorMessage("")
                 return
             }
-            renderLoading(el)
-            el.scrollIntoView({ behavior: "smooth", block: "start" })
+            setStatus("loading")
+            setErrorMessage("")
+            containerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
             trpcClient.search.search.query({ q: query })
                 .then(function applyResults(data) {
-                    const c = document.getElementById(RESULTS_CONTAINER_ID)
-                    if (c === null) return
-                    renderResults(c, toSearchResults(data.results))
-                    c.scrollIntoView({ behavior: "smooth", block: "start" })
+                    setResults(toSearchResults(data.results))
+                    setStatus("done")
+                    containerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
                 })
-                .catch(function onError(err) {
-                    const c = document.getElementById(RESULTS_CONTAINER_ID)
-                    if (c === null) return
-                    renderError(c, "Ошибка поиска")
+                .catch(function onError(err: unknown) {
+                    setStatus("error")
+                    setErrorMessage("Ошибка поиска")
+                    setResults([])
                     console.error("search failed", err)
                 })
         }
-
-        renderPlaceholder(container, "")
-        const unsubscribe = EventBus.subscribe("search", onSearch)
+        const unsubscribe = EventBus.subscribe("search", runSearch)
         return unsubscribe
     }, [])
 
-    return <div id={RESULTS_CONTAINER_ID} className="search-page-results" />
+    function renderBody() {
+        if (status === "loading") return <p className="result-loading">Загрузка…</p>
+        if (status === "error") return <p className="result-error">{errorMessage}</p>
+        if (status === "done" && results.length === 0) return <p className="result-placeholder">Ничего не найдено</p>
+        if (status === "idle") return <p className="result-placeholder" />
+        const valid = results.filter(function hasUrl(r) { return r.url.length > 0 })
+        if (valid.length === 0) return <p className="result-placeholder">Ничего не найдено</p>
+        return (
+            <>
+                {valid.map(function ResultItem(r) {
+                    return (
+                        <div key={r.url} className="result-item glass">
+                            <a href={r.url} target="_blank" rel="noopener noreferrer">{r.title ?? r.url}</a>
+                            <div className="result-snippet">{r.snippet ?? ""}</div>
+                            <div className="result-meta">rank: {r.rank}</div>
+                        </div>
+                    )
+                })}
+            </>
+        )
+    }
+
+    return (
+        <div ref={containerRef} className="search-page-results">
+            {renderBody()}
+        </div>
+    )
 }

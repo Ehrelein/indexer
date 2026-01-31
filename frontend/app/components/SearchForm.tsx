@@ -5,7 +5,7 @@ import { EventBus } from "@/lib/eventBus"
 import { SearchButton } from "@/app/components/SearchButton"
 
 export function SearchForm() {
-  useEffect(function bindSubmit() {
+  useEffect(() => {
     const form = document.getElementById("kqpwmxnr") as HTMLFormElement | null
     const input = document.getElementById("vbhcytlz") as HTMLInputElement | null
     if (form === null || input === null) return
@@ -21,24 +21,24 @@ export function SearchForm() {
       doSearch()
     }
 
-    function onKeyDown(e: KeyboardEvent) {
+    function keydown(e: KeyboardEvent) {
       if (e.key !== "Enter") return
       e.preventDefault()
       doSearch()
     }
 
-    function onInput() {
+    function inputcb() {
       const disabled = (input?.value ?? "").trim().length === 0
       EventBus.emit("search-button:toggle-available", disabled)
     }
 
     form.addEventListener("submit", submit)
-    input.addEventListener("keydown", onKeyDown)
-    form.addEventListener("input", onInput)
+    input.addEventListener("keydown", keydown)
+    form.addEventListener("input", inputcb)
     return function cleanup() {
       form.removeEventListener("submit", submit)
-      input.removeEventListener("keydown", onKeyDown)
-      form.removeEventListener("input", onInput)
+      input.removeEventListener("keydown", keydown)
+      form.removeEventListener("input", inputcb)
     }
   }, [])
 

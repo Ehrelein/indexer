@@ -6,9 +6,13 @@ button {
     cursor: default;
 }
 
+html,
 body {
     margin: 0;
+    height: 100%;
+    overflow: hidden;
     font-size: 16px;
+    background-color: #2a2a2a;
 }
 
 .glass {
@@ -16,12 +20,16 @@ body {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.2);
+    /* box-shadow:
+        0 1px 24px 0 rgba(255, 255, 255, 0.2),
+        0 0 8px 2px #fff9; */
+    transition: box-shadow 0.22s cubic-bezier(0.5, 0.15, 0.32, 1.6);
 }
 
 .search-page {
-    min-height: 100vh;
+    height: 100vh;
     position: relative;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 .search-page-bg {
@@ -30,6 +38,8 @@ body {
     background-image: url('/kepochka.png');
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
+    filter: brightness(0.4);
     z-index: 0;
 }
 
@@ -43,26 +53,37 @@ body {
 .search-page-content {
     position: relative;
     z-index: 2;
+    height: 100%;
     width: 100%;
-    max-width: 36rem;
-    margin: 0 auto;
-    padding: 1.5rem 1.5rem 2rem;
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    overflow: hidden;
     color: rgba(255, 255, 255, 0.95);
 }
 
-.search-page-strip {
+.search-page-top {
+    flex-shrink: 0;
     width: 100%;
+    padding: 2rem 2rem 1.5rem;
+    box-sizing: border-box;
+}
+
+.search-page-top .input-form {
     max-width: 584px;
-    margin-bottom: 1.5rem;
+    margin: 0 auto;
+}
+
+.search-page-bottom {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .input-form {
     width: 100%;
-    margin-bottom: 2rem;
+    margin: 0;
     display: flex;
     align-items: center;
     border-radius: 2rem;
@@ -144,7 +165,35 @@ body {
 }
 
 .search-page-results {
+    height: 100%;
     width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.5rem 2rem 1rem 2rem;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+}
+
+.search-page-results::-webkit-scrollbar {
+    width: 8px;
+}
+
+.search-page-results::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.search-page-results::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 4px;
+}
+
+.search-page-results::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.search-page-results::-webkit-scrollbar-button {
+    display: none;
 }
 
 .search-page-results .result-item {
