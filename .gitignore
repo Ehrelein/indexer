@@ -7,3 +7,6 @@ dist/
 .DS_Store
 .idea/
 *.tsbuildinfo
+.next/
+frontend/.next/
+frontend/.next

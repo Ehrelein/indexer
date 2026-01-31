@@ -9,6 +9,7 @@ import { createRedisVisitedStore } from "./visited.js"
 
 const Env = {
     SEED_URL: "SEED_URL",
+    SEED_URLS: "SEED_URLS",
     REDIS_URL: "REDIS_URL",
     KAFKA_BROKERS: "KAFKA_BROKERS",
     RATE_LIMIT_PER_SECOND: "RATE_LIMIT_PER_SECOND",
@@ -16,10 +17,21 @@ const Env = {
 
 const DEFAULT_RATE_LIMIT_PER_SECOND = 2
 
-function getSeedUrl(): string | null {
-    const raw = process.env[Env.SEED_URL]
-    if (raw === undefined || raw === "") return null
-    return raw.trim()
+function getSeedUrls(): string[] {
+    const multi = process.env[Env.SEED_URLS]
+    if (multi !== undefined && multi.trim() !== "") {
+        return multi
+            .split(",")
+            .map(function trim(s) {
+                return s.trim()
+            })
+            .filter(function nonEmpty(s) {
+                return s.length > 0
+            })
+    }
+    const single = process.env[Env.SEED_URL]
+    if (single === undefined || single.trim() === "") return []
+    return [single.trim()]
 }
 
 function getRedisUrl(): string | null {
@@ -42,7 +54,22 @@ function getRateLimitPerSecond(): number {
     return n
 }
 
-async function bootstrapSeedUrl(brokers: string, seedUrl: string): Promise<void> {
+function seedTldAllowed(seedUrl: string): boolean {
+    const allowed = CrawlKafka.allowedTlds()
+    if (allowed.size === 0) return true
+    try {
+        const hostname = new URL(seedUrl).hostname
+        if (hostname === "") return false
+        const tld = hostname.trim().toLowerCase().split(".").pop() ?? ""
+        return tld !== "" && allowed.has(tld)
+    } catch {
+        return false
+    }
+}
+
+async function bootstrapSeedUrls(brokers: string, urls: string[]): Promise<void> {
+    const allowed = urls.filter(seedTldAllowed)
+    if (allowed.length === 0) return
     let producer: Awaited<ReturnType<typeof CrawlKafka.producer>> = null
     try {
         producer = await CrawlKafka.producer(brokers)
@@ -52,7 +79,13 @@ async function bootstrapSeedUrl(brokers: string, seedUrl: string): Promise<void>
     if (producer === null) return
     try {
         const sender = CrawlKafka.sender(producer, CrawlKafka.topic(), CrawlKafka.topicPriority())
-        await sender.send(seedUrl, 0)
+        for (const url of allowed) {
+            try {
+                await sender.send(url, 0)
+            } catch {
+                //
+            }
+        }
     } finally {
         try {
             await producer.disconnect()
@@ -73,8 +106,8 @@ async function run(): Promise<void> {
             process.exit(1)
             return
         }
-        const seedUrl = getSeedUrl()
-        if (seedUrl !== null) await bootstrapSeedUrl(brokers, seedUrl)
+        const seedUrls = getSeedUrls()
+        if (seedUrls.length > 0) await bootstrapSeedUrls(brokers, seedUrls)
         const visited = await createRedisVisitedStore(redisUrl)
         if (visited === null) {
             console.error("Redis connect failed")
@@ -83,14 +116,20 @@ async function run(): Promise<void> {
         }
         const maxPerSecond = getRateLimitPerSecond()
         const rateLimiter = (await createRedisRateLimiter(redisUrl, maxPerSecond)) ?? createMemoryRateLimiter(maxPerSecond)
-        await CrawlKafka.runConsumer(
-            brokers,
-            CrawlKafka.topic(),
-            CrawlKafka.topicPriority(),
-            CrawlKafka.groupId(),
-            visited,
-            rateLimiter
-        )
+        const RECONNECT_DELAY_MS = 5000
+        for (; ;) {
+            await CrawlKafka.runConsumer(
+                brokers,
+                CrawlKafka.topic(),
+                CrawlKafka.topicPriority(),
+                CrawlKafka.groupId(),
+                visited,
+                rateLimiter
+            )
+            await new Promise(function resolveAfter(r) {
+                setTimeout(r, RECONNECT_DELAY_MS)
+            })
+        }
     } catch (reason) {
         console.error(reason)
         process.exit(1)

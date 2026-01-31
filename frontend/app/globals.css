@@ -1,0 +1,193 @@
+* {
+    user-select: none;
+}
+
+button {
+    cursor: default;
+}
+
+body {
+    margin: 0;
+    font-size: 16px;
+}
+
+.glass {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.search-page {
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.search-page-bg {
+    position: fixed;
+    inset: 0;
+    background-image: url('/kepochka.png');
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
+
+.search-page-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1;
+}
+
+.search-page-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 36rem;
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem 2rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.search-page-strip {
+    width: 100%;
+    max-width: 584px;
+    margin-bottom: 1.5rem;
+}
+
+.input-form {
+    width: 100%;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    border-radius: 2rem;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 0.75rem;
+}
+
+.input-form.hover-lighten:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.28);
+}
+
+.input-form .chat-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.5rem 1rem;
+    font-size: 19px;
+    line-height: 1.5;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: rgba(255, 255, 255, 0.95);
+    user-select: text;
+    caret-color: rgba(255, 255, 255, 0.95);
+}
+
+.input-form .chat-input::selection {
+    background: #53d92633;
+}
+
+.input-form .chat-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.input-form .send-button {
+    width: 2.5rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    border-radius: 50%;
+    background: #53d92633;
+    color: rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.5rem;
+}
+
+.input-form .send-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+.input-form .send-button:not(:disabled) {
+    background: #53d92633;
+    border: 1px solid rgba(16, 185, 129, 0.5);
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.input-form .send-button.hover-lighten:not(:disabled):hover {
+    background: #53d92644;
+    border-color: rgba(16, 185, 129, 0.6);
+}
+
+.input-form .send-button:disabled {
+    cursor: default;
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.search-page-content a {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.search-page-content a:hover {
+    text-decoration: underline;
+}
+
+.search-page-results {
+    width: 100%;
+}
+
+.search-page-results .result-item {
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+.search-page-results .result-item.glass {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.search-page-results .result-item a {
+    display: block;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+
+.search-page-results .result-snippet {
+    font-size: 0.9rem;
+    line-height: 1.45;
+    opacity: 0.88;
+    margin-bottom: 0.25rem;
+}
+
+.search-page-results .result-meta {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.search-page-results .result-placeholder,
+.search-page-results .result-loading {
+    font-size: 0.95rem;
+    opacity: 0.8;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.search-page-results .result-error {
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 1rem 0;
+    color: #e57373;
+}

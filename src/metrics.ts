@@ -12,6 +12,7 @@ let pageDurationCount = 0
 let queueSize = 0
 let dataVolumeBytes = 0
 let workersActive = 0
+let tldRejectedTotal = 0
 
 function formatCounter(name: string, value: number): string {
     return `# TYPE ${PREFIX}_${name} counter\n${PREFIX}_${name} ${value}\n`
@@ -41,6 +42,7 @@ function renderMetrics(): string {
         formatCounter("pages_saved_total", pagesSaved),
         formatCounter("kafka_sent_total", kafkaSent),
         formatCounter("data_volume_bytes_total", dataVolumeBytes),
+        formatCounter("tld_rejected_total", tldRejectedTotal),
         formatGauge("queue_size", queueSize),
         formatGauge("workers_active", workersActive),
     ]
@@ -64,7 +66,7 @@ function serveMetrics(port: number): void {
         res.writeHead(404)
         res.end()
     })
-    server.listen(port, function onListen() {
+    server.listen(port, "0.0.0.0", function onListen() {
         //
     })
 }
@@ -92,6 +94,9 @@ export const Metrics = {
     },
     incrementKafkaSent() {
         kafkaSent += 1
+    },
+    incrementTldRejected() {
+        tldRejectedTotal += 1
     },
     observePageDuration(seconds: number) {
         if (!Number.isFinite(seconds) || seconds < 0) return

@@ -8,6 +8,8 @@
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "dev": "node --loader ts-node/esm src/index.ts",
+        "dev:web": "npm run dev --prefix frontend",
+        "web": "npm run dev --prefix frontend",
         "build": "tsc",
         "format": "prettier --write .",
         "format:check": "prettier --check ."

@@ -35,7 +35,8 @@ export function parse(html: string): ParsedPage | null {
                 .querySelector('meta[name="description"]')
                 ?.getAttribute('content') ?? null
 
-        const content = document.body?.innerHTML ?? ""
+        const raw = document.body?.textContent ?? ""
+        const content = raw.replace(/\s+/g, " ").trim()
         const h1 = document.querySelector("h1")?.textContent?.trim() ?? null
 
         const hrefs = Array

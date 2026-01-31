@@ -22,6 +22,7 @@ export default tseslint.config(
             },
         },
         rules: {
+            '@typescript-eslint/no-namespace': 'off',
             '@typescript-eslint/no-explicit-any': 'error',
             '@typescript-eslint/consistent-type-imports': 'error',
             '@typescript-eslint/no-floating-promises': 'error',

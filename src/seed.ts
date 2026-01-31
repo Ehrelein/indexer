@@ -67,7 +67,9 @@ function getHostname(url: string): string | null {
 }
 
 function getTld(hostname: string): string | null {
-    const parts = hostname.split(".")
+    const normalized = hostname.trim().toLowerCase()
+    if (normalized === "") return null
+    const parts = normalized.split(".")
     const last = parts[parts.length - 1]
     return last ?? null
 }

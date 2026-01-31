@@ -1,5 +1,6 @@
 import { Kafka } from "kafkajs"
 import type { Producer } from "kafkajs"
+import { prisma } from "./db.js"
 import { savePage } from "./db.js"
 import { fetchHtml } from "./fetch.js"
 import { MAX_URL_LENGTH } from "./limits.js"
@@ -16,8 +17,9 @@ export type UrlSender = {
     sendPriority(url: string, depth: number): Promise<void>
 }
 
-const DELAY_MS = 1500
+const DELAY_MS = 100
 const DEFAULT_MAX_DEPTH = 3
+const MAX_PAGES_PER_HOST = 100
 const DEFAULTS = { topic: "crawl-urls", topicPriority: "crawl-urls-priority", groupId: "crawler-1" } as const
 
 const ENV_KEYS: Record<keyof typeof DEFAULTS, string> = {
@@ -32,6 +34,7 @@ function env(key: keyof typeof DEFAULTS): string {
 }
 
 const ENV_MAX_DEPTH = "CRAWL_MAX_DEPTH"
+const ENV_ALLOWED_TLDS = "CRAWL_ALLOWED_TLDS"
 
 function getMaxDepth(): number {
     const raw = process.env[ENV_MAX_DEPTH]
@@ -39,6 +42,29 @@ function getMaxDepth(): number {
     const n = Number.parseInt(raw.trim(), 10)
     if (!Number.isInteger(n) || n < 0) return DEFAULT_MAX_DEPTH
     return n
+}
+
+function getAllowedTlds(): Set<string> {
+    const raw = process.env[ENV_ALLOWED_TLDS]
+    if (raw === undefined || raw === "") return new Set<string>()
+    return new Set(
+        raw
+            .split(",")
+            .map(function normalize(s) {
+                return s.trim().toLowerCase().replace(/^\./, "").replace(/\.$/, "")
+            })
+            .filter(function nonEmpty(s) {
+                return s.length > 0
+            })
+    )
+}
+
+function tldFromHost(hostname: string): string {
+    const normalized = hostname.trim().toLowerCase()
+    if (normalized === "") return ""
+    const parts = normalized.split(".")
+    const last = parts[parts.length - 1]
+    return last ?? ""
 }
 
 function parsePayload(raw: string): CrawlPayload | null {
@@ -74,15 +100,23 @@ async function handleUrl(
     url: string,
     depth: number,
     maxDepth: number,
+    allowedTlds: Set<string>,
     visited: VisitedStore,
     sender: UrlSender,
     rateLimiter?: RateLimiter
 ): Promise<void> {
     if (url.length > MAX_URL_LENGTH) return
     const base = host(url)
-    if (base === null) return
+    if (base === null || base === "") return
+    const tld = tldFromHost(base)
+    if (allowedTlds.size > 0 && !allowedTlds.has(tld)) {
+        Metrics.incrementTldRejected()
+        return
+    }
     try {
         if (!(await visited.addIfAbsent(url))) return
+        const hostPageCount = await prisma.page.count({ where: { host: base } })
+        if (hostPageCount >= MAX_PAGES_PER_HOST) return
         if (rateLimiter !== undefined) {
             try {
                 await rateLimiter.acquire()
@@ -101,6 +135,8 @@ async function handleUrl(
         await savePage({ url, statusCode: res.statusCode, parsed })
         Metrics.observePageDuration((Date.now() - t0) / 1000)
         if (depth >= maxDepth) return
+        const hostPageCountAfter = await prisma.page.count({ where: { host: base } })
+        if (hostPageCountAfter >= MAX_PAGES_PER_HOST) return
         const nextDepth = depth + 1
         await Promise.all(
             parsed.localLinks.map(async function push(href) {
@@ -150,7 +186,7 @@ async function connect(
         return null
     }
     try {
-        await consumer.subscribe({ topics: [topicPriority, topicMain], fromBeginning: false })
+        await consumer.subscribe({ topics: [topicPriority, topicMain], fromBeginning: true })
     } catch {
         await consumer.disconnect()
         await producer.disconnect()
@@ -189,6 +225,9 @@ export const CrawlKafka = {
     maxDepth() {
         return getMaxDepth()
     },
+    allowedTlds() {
+        return getAllowedTlds()
+    },
     sender(producer: Producer, topicMain: string, topicPriority: string): UrlSender {
         return {
             async send(url: string, depth: number) {
@@ -226,10 +265,15 @@ export const CrawlKafka = {
             conn = await connect(brokers, topicMain, topicPriority, groupId)
             if (conn === null) return
             const maxDepth = CrawlKafka.maxDepth()
+            const allowedTlds = CrawlKafka.allowedTlds()
+            if (allowedTlds.size > 0) {
+                const list = [...allowedTlds].sort().join(", ")
+                console.error(`CRAWL_ALLOWED_TLDS active (${allowedTlds.size}): ${list}. URLs with other TLDs skipped (crawler_tld_rejected_total).`)
+            }
             const sender = CrawlKafka.sender(conn.producer, topicMain, topicPriority)
             const priorityQueue: PendingMessage[] = []
             const mainQueue: PendingMessage[] = []
-            await conn.consumer.run({
+            conn.consumer.run({
                 eachMessage: async function onMessage(payload) {
                     const resolvePromise = new Promise<void>(function resolveOnce(resolve) {
                         const item: PendingMessage = { payload, resolve }
@@ -247,7 +291,7 @@ export const CrawlKafka = {
                 }
                 try {
                     const v = item.payload.message.value
-                    if (v === null) {
+                    if (v === null || v === undefined) {
                         item.resolve()
                         continue
                     }
@@ -262,7 +306,7 @@ export const CrawlKafka = {
                         await sleep(DELAY_MS)
                         continue
                     }
-                    await handleUrl(payload.url, payload.depth, maxDepth, visited, sender, rateLimiter)
+                    await handleUrl(payload.url, payload.depth, maxDepth, allowedTlds, visited, sender, rateLimiter)
                     await sleep(DELAY_MS)
                 } catch {
                     //
