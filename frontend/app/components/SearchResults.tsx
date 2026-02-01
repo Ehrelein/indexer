@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { EventBus } from "@/lib/eventBus"
 import { trpcClient } from "@/lib/trpc-client"
+import { useDebugLog } from "@/app/hooks/useDebugLog"
 
 type SearchResult = {
     url: string
@@ -27,31 +28,40 @@ function toSearchResults(val: unknown): SearchResult[] {
 
 type Status = "idle" | "loading" | "done" | "error"
 
+const SEARCH_RESULTS_DEBUG_ID = "search-results-debug"
+
 export function SearchResults() {
     const [status, setStatus] = useState<Status>("idle")
     const [results, setResults] = useState<SearchResult[]>([])
     const [errorMessage, setErrorMessage] = useState("")
     const containerRef = useRef<HTMLDivElement>(null)
+    const { log } = useDebugLog(SEARCH_RESULTS_DEBUG_ID)
 
     useEffect(() => {
+        log("mounted")
         function runSearch(data: { query?: string }) {
             const query = (data.query ?? "").trim()
             if (query === "") {
+                log("runSearch clear")
                 setStatus("idle")
                 setResults([])
                 setErrorMessage("")
                 return
             }
+            log("runSearch", query)
             setStatus("loading")
             setErrorMessage("")
             containerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
             trpcClient.search.search.query({ q: query })
                 .then(function applyResults(data) {
-                    setResults(toSearchResults(data.results))
+                    const list = toSearchResults(data.results)
+                    log("results", list.length)
+                    setResults(list)
                     setStatus("done")
                     containerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
                 })
                 .catch(function onError(err: unknown) {
+                    log("error", err)
                     setStatus("error")
                     setErrorMessage("Ошибка поиска")
                     setResults([])
@@ -60,7 +70,11 @@ export function SearchResults() {
         }
         const unsubscribe = EventBus.subscribe("search", runSearch)
         return unsubscribe
-    }, [])
+    }, [log])
+
+    useEffect(() => {
+        log("state", status, "results", results.length)
+    }, [log, status, results.length])
 
     function renderBody() {
         if (status === "loading") return <p className="result-loading">Загрузка…</p>
@@ -85,7 +99,7 @@ export function SearchResults() {
     }
 
     return (
-        <div ref={containerRef} className="search-page-results">
+        <div ref={containerRef} id={SEARCH_RESULTS_DEBUG_ID} className="search-page-results">
             {renderBody()}
         </div>
     )
