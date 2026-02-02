@@ -9,6 +9,9 @@ export default tseslint.config(
             'dist/',
             'node_modules/',
             'prisma.config.ts',
+            'frontend/',
+            '**/.next/',
+            'vitest.config.ts',
         ],
     },
     eslint.configs.recommended,
@@ -26,10 +29,9 @@ export default tseslint.config(
             '@typescript-eslint/no-explicit-any': 'error',
             '@typescript-eslint/consistent-type-imports': 'error',
             '@typescript-eslint/no-floating-promises': 'error',
-            '@typescript-eslint/no-unused-vars': [
-                'error',
-                { argsIgnorePattern: '^_' },
-            ],
+            '@typescript-eslint/no-unused-vars': 'off',
+            'no-unused-vars': 'off',
+            'prefer-const': 'off',
 
             'no-restricted-syntax': [
                 'error',

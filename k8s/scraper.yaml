@@ -15,20 +15,20 @@ spec:
         spec:
             initContainers:
                 - name: migrate
-                  image: pet-scraper:latest
+                  image: indexer-scraper:latest
                   imagePullPolicy: IfNotPresent
                   command: ['npx', 'prisma', 'migrate', 'deploy']
                   envFrom:
                       - secretRef:
                             name: scraper
             containers:
-        - name: scraper
-          image: pet-scraper:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 9090
-              name: metrics
-          envFrom:
+                - name: scraper
+                  image: indexer-scraper:latest
+                  imagePullPolicy: IfNotPresent
+                  ports:
+                      - containerPort: 9090
+                        name: metrics
+                  envFrom:
                       - configMapRef:
                             name: scraper
                       - secretRef:
@@ -39,5 +39,4 @@ spec:
                           cpu: 100m
                       limits:
                           memory: 8Gi
-                          cpu: '2'
-            restartPolicy: Always
+                          cpu: "2"

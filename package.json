@@ -7,6 +7,7 @@
     "scripts": {
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
+        "test": "vitest run",
         "dev": "node --loader ts-node/esm src/index.ts",
         "dev:web": "npm run dev --prefix frontend",
         "web": "npm run dev --prefix frontend",
@@ -25,7 +26,8 @@
         "prettier": "^3.8.1",
         "ts-node": "^10.9.2",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.53.1"
+        "typescript-eslint": "^8.53.1",
+        "vitest": "^3.2.4"
     },
     "dependencies": {
         "@prisma/adapter-pg": "^7.3.0",

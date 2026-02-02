@@ -56,6 +56,7 @@ services:
     scraper:
         profiles:
             - crawler
+        image: indexer-scraper:latest
         build: .
         restart: unless-stopped
         environment:
@@ -78,6 +79,7 @@ services:
     web:
         profiles:
             - crawler
+        image: indexer-web:latest
         build:
             context: ./frontend
             dockerfile: Dockerfile

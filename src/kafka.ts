@@ -273,7 +273,7 @@ export const CrawlKafka = {
             const sender = CrawlKafka.sender(conn.producer, topicMain, topicPriority)
             const priorityQueue: PendingMessage[] = []
             const mainQueue: PendingMessage[] = []
-            conn.consumer.run({
+            void conn.consumer.run({
                 eachMessage: async function onMessage(payload) {
                     const resolvePromise = new Promise<void>(function resolveOnce(resolve) {
                         const item: PendingMessage = { payload, resolve }
