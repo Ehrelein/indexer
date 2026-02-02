@@ -19,12 +19,12 @@ body {
 .glass {
     background: linear-gradient(
         135deg,
-        rgba(34, 197, 94, 0.15) 0%,
-        rgba(22, 163, 74, 0.15) 100%
+        rgba(120, 0, 30, 0.22) 0%,
+        rgba(126, 0, 22, 0.22) 100%
     );
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(34, 197, 94, 0.35);
+    border: 1px solid rgba(120, 0, 30, 0.45);
     box-shadow:
         0 4px 16px rgba(0, 0, 0, 0.25),
         0 1px 0 rgba(255, 255, 255, 0.1) inset;
@@ -40,7 +40,7 @@ body {
 .search-page-bg {
     position: fixed;
     inset: 0;
-    background-image: url('/kepochka.png');
+    background-image: url('/monday.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -95,10 +95,10 @@ body {
     overflow: hidden;
     background: linear-gradient(
         135deg,
-        rgba(34, 197, 94, 0.12) 0%,
-        rgba(22, 163, 74, 0.12) 100%
+        rgba(120, 0, 30, 0.24) 0%,
+        rgba(126, 0, 22, 0.18) 100%
     );
-    border: 1px solid rgba(34, 197, 94, 0.35);
+    border: 1px solid rgba(120, 0, 30, 0.45);
     box-shadow:
         0 4px 16px rgba(0, 0, 0, 0.25),
         0 1px 0 rgba(255, 255, 255, 0.1) inset;
@@ -112,10 +112,10 @@ body {
 .input-form.hover-lighten:hover {
     background: linear-gradient(
         135deg,
-        rgba(34, 197, 94, 0.2) 0%,
-        rgba(22, 163, 74, 0.2) 100%
+        rgba(120, 0, 30, 0.28) 0%,
+        rgba(126, 0, 22, 0.28) 100%
     );
-    border-color: rgba(34, 197, 94, 0.5);
+    border-color: rgba(120, 0, 30, 0.58);
     box-shadow:
         0 4px 16px rgba(0, 0, 0, 0.3),
         0 1px 0 rgba(255, 255, 255, 0.14) inset;
@@ -136,7 +136,7 @@ body {
 }
 
 .input-form .chat-input::selection {
-    background: #53d92633;
+    background: rgba(120, 0, 30, 0.28);
 }
 
 .input-form .chat-input::placeholder {
@@ -148,11 +148,11 @@ body {
     height: 2.5rem;
     flex-shrink: 0;
     border-radius: 18px;
-    border: 1px solid rgba(34, 197, 94, 0.35);
+    border: 1px solid rgba(120, 0, 30, 0.45);
     background: linear-gradient(
         135deg,
-        rgba(34, 197, 94, 0.12) 0%,
-        rgba(22, 163, 74, 0.12) 100%
+        rgba(120, 0, 30, 0.24) 0%,
+        rgba(126, 0, 22, 0.18) 100%
     );
     box-shadow:
         0 4px 16px rgba(0, 0, 0, 0.25),
@@ -176,10 +176,10 @@ body {
 .input-form .send-button:not(:disabled):hover {
     background: linear-gradient(
         135deg,
-        rgba(34, 197, 94, 0.2) 0%,
-        rgba(22, 163, 74, 0.2) 100%
+        rgba(120, 0, 30, 0.28) 0%,
+        rgba(126, 0, 22, 0.28) 100%
     );
-    border-color: rgba(34, 197, 94, 0.5);
+    border-color: rgba(120, 0, 30, 0.58);
     box-shadow:
         0 4px 16px rgba(0, 0, 0, 0.3),
         0 1px 0 rgba(255, 255, 255, 0.14) inset;
@@ -187,8 +187,8 @@ body {
 
 .input-form .send-button:disabled {
     cursor: default;
-    background: rgba(34, 197, 94, 0.06);
-    border-color: rgba(34, 197, 94, 0.15);
+    background: rgba(120, 0, 30, 0.1);
+    border-color: rgba(120, 0, 30, 0.2);
     box-shadow:
         0 2px 8px rgba(0, 0, 0, 0.15),
         0 1px 0 rgba(255, 255, 255, 0.05) inset;
@@ -244,10 +244,10 @@ body {
 .search-page-results .result-item.glass {
     background: linear-gradient(
         135deg,
-        rgba(34, 197, 94, 0.1) 0%,
-        rgba(22, 163, 74, 0.1) 100%
+        rgba(120, 0, 30, 0.16) 0%,
+        rgba(126, 0, 22, 0.16) 100%
     );
-    border: 1px solid rgba(34, 197, 94, 0.35);
+    border: 1px solid rgba(120, 0, 30, 0.45);
     box-shadow:
         0 4px 16px rgba(0, 0, 0, 0.25),
         0 1px 0 rgba(255, 255, 255, 0.08) inset;
@@ -260,10 +260,10 @@ body {
 .search-page-results .result-item.glass:hover {
     background: linear-gradient(
         135deg,
-        rgba(34, 197, 94, 0.18) 0%,
-        rgba(22, 163, 74, 0.18) 100%
+        rgba(120, 0, 30, 0.24) 0%,
+        rgba(126, 0, 22, 0.24) 100%
     );
-    border-color: rgba(34, 197, 94, 0.5);
+    border-color: rgba(120, 0, 30, 0.58);
     box-shadow:
         0 4px 16px rgba(0, 0, 0, 0.3),
         0 1px 0 rgba(255, 255, 255, 0.12) inset;
