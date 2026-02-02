@@ -53,6 +53,7 @@ export async function createRedisRateLimiter(
                         await client.expire(key, REDIS_WINDOW_TTL_SEC)
                         if (count <= maxPerSecond) return
                         const now = Date.now()
+                        await client.decr(key)
                         const waitMs = WINDOW_MS - (now % WINDOW_MS)
                         if (waitMs > 0) await sleep(waitMs)
                     } catch {
