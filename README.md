@@ -16,7 +16,7 @@ Kubernetes, Docker, Kafka, Redis, PostgreSQL, TypeScript, Next.js
 
 - Очередь URL в Kafka (обычный + приоритетный топик), дедупляция и rate limit в Redis.
 - Поиск по словам через инвертированный индекс (`page_words`), ранжирование по `rank`.
-- ![Прямой доступ к DOM через useEffect и переменные вместо state](https://i.imgur.com/CIUWzg7.png) — удобнее писать.
-- ![Типизация событий для useEffect](https://i.imgur.com/x7Xryla.png) — типобезопасный код под гибкость.
+- Прямой доступ к DOM через useEffect и переменные вместо state ![Прямой доступ к DOM через useEffect и переменные вместо state](https://i.imgur.com/CIUWzg7.png)
+- Типизация событий для useEffect ![Типизация событий для useEffect](https://i.imgur.com/x7Xryla.png)
 
 Тесты: `npm test`.
