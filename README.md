@@ -1,8 +1,8 @@
 # pet
- [  ]
-Веб-краулер с очередью Kafka и поиском по накрауленным страницам. [  ]
-фронт: https://pet-search.fly.dev [  ]
-точно можно искать: python, signup, documentation [  ]
+ <br>
+Веб-краулер с очередью Kafka и поиском по накрауленным страницам. <br>
+фронт: https://pet-search.fly.dev <br>
+точно можно искать: python, signup, documentation <br>
 
 ![Архитектура](https://i.imgur.com/OdPv9sp.png)
 
