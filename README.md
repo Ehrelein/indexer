@@ -4,9 +4,9 @@
 фронт: https://pet-search.fly.dev
 точно можно искать: python, signup, documentation
 
-![Архитектура](https://imgur.com/OdPv9sp)
+![Архитектура](https://i.imgur.com/OdPv9sp.png)
 
-![Фронт](https://imgur.com/JY3cym6)
+![Фронт](https://i.imgur.com/JY3cym6.png)
 
 ## Стак
 
@@ -16,7 +16,7 @@ Kubernetes, Docker, Kafka, Redis, PostgreSQL, TypeScript, Next.js
 
 - Очередь URL в Kafka (обычный + приоритетный топик), дедупляция и rate limit в Redis.
 - Поиск по словам через инвертированный индекс (`page_words`), ранжирование по `rank`.
-- [Прямой доступ к DOM через useEffect и переменные вместо state](https://imgur.com/CIUWzg7) — удобнее писать.
-- [Типизация событий для useEffect](https://imgur.com/x7Xryla) — типобезопасный код под гибкость.
+- [Прямой доступ к DOM через useEffect и переменные вместо state](https://i.imgur.com/CIUWzg7.png) — удобнее писать.
+- [Типизация событий для useEffect](https://i.imgur.com/x7Xryla.png) — типобезопасный код под гибкость.
 
 Тесты: `npm test`.
