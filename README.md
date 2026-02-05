@@ -1,5 +1,5 @@
 # pet
- <br>
+
 Веб-краулер с очередью Kafka и поиском по накрауленным страницам. <br>
 Фронт: https://pet-search.fly.dev <br>
 Точно можно искать: python, signup, documentation <br>
