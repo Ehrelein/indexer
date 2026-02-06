@@ -23,6 +23,8 @@ jobs:
 
             - name: Generate Prisma client
               run: npx prisma generate
+              env:
+                  DATABASE_URL: "postgresql://ci:dummy@localhost:5432/ci?schema=public"
 
             - name: Lint
               run: npm run lint
