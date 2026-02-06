@@ -107,7 +107,11 @@ export async function savePage(result: SeedResult): Promise<boolean> {
             },
             select: { id: true },
         })
-        const words = tokenize(content)
+        const title = result.parsed.title ?? ""
+        const description = result.parsed.description ?? ""
+        const h1 = result.parsed.h1 ?? ""
+        const textToIndex = [title, description, h1, content].filter(Boolean).join(" ")
+        const words = tokenize(textToIndex)
         try {
             await prisma.pageWord.deleteMany({ where: { pageId: page.id } })
             for (let i = 0; i < words.length; i += WORD_BATCH_SIZE) {
@@ -143,5 +147,20 @@ export async function savePages(results: SeedResult[]): Promise<number> {
         return outcomes.filter(Boolean).length
     } catch {
         return 0
+    }
+}
+
+export async function rebuildPageWordsFromText(pageId: number, text: string): Promise<void> {
+    const words = tokenize(text)
+    try {
+        await prisma.pageWord.deleteMany({ where: { pageId } })
+        for (let i = 0; i < words.length; i += WORD_BATCH_SIZE) {
+            const chunk = words.slice(i, i + WORD_BATCH_SIZE)
+            const data = chunk.map(function toRow(w) { return { word: w, pageId } })
+            await prisma.pageWord.createMany({ data, skipDuplicates: true })
+        }
+    } catch (e) {
+        const err = e instanceof Error ? e : new Error(String(e))
+        throw new Error("rebuildPageWordsFromText failed", { cause: err })
     }
 }
